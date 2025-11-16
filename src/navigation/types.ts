@@ -17,6 +17,13 @@ export type MainTabParamList = {
   BookingConfirmation: { bookingId: string };
   BookingDetail: { bookingId: string };
   CreateProperty: undefined;
+  ReviewList: { propertyId: string };
+  WriteReview: { propertyId: string; bookingId: string };
+  Chat: { bookingId: string };
+  MessageList: undefined;
+  EditProfile: undefined;
+  Settings: undefined;
+  HostDashboard: undefined;
 };
 
 export type PropertyStackParamList = {

@@ -8,22 +8,49 @@ import { Button } from '../../components/common/Button';
 import { colors, spacing } from '../../config/theme';
 import { formatCurrency, formatRating } from '../../utils/formatting';
 import { Header } from '../../components/layout/Header';
+import { useAuth } from '../../context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
 export const PropertyDetailScreen: React.FC = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const { user } = useAuth();
   // @ts-ignore
   const { propertyId } = route.params;
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageIndex, setImageIndex] = useState(0);
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
     loadProperty();
+    checkWishlist();
   }, [propertyId]);
+
+  const checkWishlist = async () => {
+    try {
+      const wishlist = await propertyApi.getWishlist();
+      setIsInWishlist(wishlist.some((p) => p.id === propertyId));
+    } catch (error) {
+      console.error('Error checking wishlist:', error);
+    }
+  };
+
+  const toggleWishlist = async () => {
+    try {
+      if (isInWishlist) {
+        await propertyApi.removeFromWishlist(propertyId);
+        setIsInWishlist(false);
+      } else {
+        await propertyApi.addToWishlist(propertyId);
+        setIsInWishlist(true);
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+    }
+  };
 
   const loadProperty = async () => {
     try {
@@ -153,10 +180,34 @@ export const PropertyDetailScreen: React.FC = () => {
             <Text style={styles.priceLabel}>Price per night</Text>
             <Text style={styles.price}>{formatCurrency(property.pricePerNight)}</Text>
           </View>
+
+          {property.rating && (
+            <TouchableOpacity
+              style={styles.reviewsSection}
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate('ReviewList', { propertyId: property.id });
+              }}
+            >
+              <View style={styles.reviewsHeader}>
+                <Text style={styles.reviewsTitle}>Reviews</Text>
+                <Text style={styles.reviewsArrow}>›</Text>
+              </View>
+              <View style={styles.ratingRow}>
+                <Text style={styles.ratingValue}>★ {formatRating(property.rating)}</Text>
+                {property.reviewCount && (
+                  <Text style={styles.reviewCount}>({property.reviewCount} reviews)</Text>
+                )}
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.wishlistButton} onPress={toggleWishlist}>
+          <Text style={styles.wishlistIcon}>{isInWishlist ? '❤️' : '🤍'}</Text>
+        </TouchableOpacity>
         <View style={styles.priceFooter}>
           <Text style={styles.priceFooterText}>
             {formatCurrency(property.pricePerNight)}
@@ -322,6 +373,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '400',
     color: colors.textSecondary,
+  },
+  wishlistButton: {
+    padding: spacing.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  wishlistIcon: {
+    fontSize: 24,
   },
   bookButton: {
     flex: 1,

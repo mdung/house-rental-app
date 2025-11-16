@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/common/Button';
-import { colors, spacing } from '../../config/theme';
+import { colors, spacing, borderRadius } from '../../config/theme';
 
 export const ProfileScreen: React.FC = () => {
+  const navigation = useNavigation();
   const { user, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -25,6 +27,52 @@ export const ProfileScreen: React.FC = () => {
               <Text style={styles.email}>{user.email}</Text>
               <Text style={styles.role}>Role: {user.role}</Text>
             </View>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate('EditProfile');
+              }}
+            >
+              <Text style={styles.menuItemText}>Edit Profile</Text>
+              <Text style={styles.arrow}>›</Text>
+            </TouchableOpacity>
+
+            {user?.role === 'host' || user?.role === 'both' ? (
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  // @ts-ignore
+                  navigation.navigate('HostDashboard');
+                }}
+              >
+                <Text style={styles.menuItemText}>Host Dashboard</Text>
+                <Text style={styles.arrow}>›</Text>
+              </TouchableOpacity>
+            ) : null}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate('MessageList');
+              }}
+            >
+              <Text style={styles.menuItemText}>Messages</Text>
+              <Text style={styles.arrow}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate('Settings');
+              }}
+            >
+              <Text style={styles.menuItemText}>Settings</Text>
+              <Text style={styles.arrow}>›</Text>
+            </TouchableOpacity>
 
             <Button
               title="Logout"
@@ -75,6 +123,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     textTransform: 'capitalize',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: colors.text,
+  },
+  arrow: {
+    fontSize: 20,
+    color: colors.textSecondary,
   },
   logoutButton: {
     marginTop: spacing.lg,
