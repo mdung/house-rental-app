@@ -21,3 +21,4 @@ export const AuthNavigator: React.FC = () => {
   );
 };
 
+

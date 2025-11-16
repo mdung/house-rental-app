@@ -73,3 +73,4 @@ export interface PropertyFilters {
   superhost?: boolean;
 }
 
+

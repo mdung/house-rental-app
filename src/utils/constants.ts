@@ -45,3 +45,4 @@ export const MIN_IMAGES_PER_PROPERTY = 5;
 
 export const DEFAULT_PAGE_SIZE = 20;
 
+
